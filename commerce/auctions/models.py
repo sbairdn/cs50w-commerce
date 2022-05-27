@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from requests import request
 
 MAX_PRICE_DIGITS = 6  # Max price is $9,999.99
 
@@ -23,12 +24,12 @@ class Listing(models.Model):
     image = models.URLField(blank=True)
     category = models.CharField(choices=Category.choices, max_length=50, blank=True)
     is_active = models.BooleanField(default=True)
-    poster = models.ForeignKey(User, on_delete=models.CASCADE, related_name="postings")
+    poster = models.ForeignKey(User, on_delete=models.CASCADE, related_name="postings", null=True)
     datetime = models.DateTimeField(auto_now_add=True, null=True)
     def __str__(self):
         string = ""
         string += "Active" if self.is_active else "Inactive"
-        return f" listing: '{self.title}' by {self.poster} for ${self.starting_bid}"
+        return f" listing: '{self.title}' by {self.poster} for ${self.start_price}"
 
 class Bid(models.Model):
     price = models.DecimalField(max_digits=MAX_PRICE_DIGITS, decimal_places=2, null=True)
