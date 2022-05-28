@@ -21,7 +21,8 @@ class Listing(models.Model):
     title = models.CharField(max_length=80)
     description = models.CharField(max_length=1000)
     start_price = models.DecimalField(max_digits=MAX_PRICE_DIGITS, decimal_places=2, null=True)
-    image = models.URLField(blank=True)
+    current_price = models.DecimalField(max_digits=MAX_PRICE_DIGITS, decimal_places=2, null=True)
+    image = models.ImageField(upload_to="images", blank=True)
     category = models.CharField(choices=Category.choices, max_length=50, blank=True)
     is_active = models.BooleanField(default=True)
     poster = models.ForeignKey(User, on_delete=models.CASCADE, related_name="postings", null=True)
@@ -29,7 +30,7 @@ class Listing(models.Model):
     def __str__(self):
         string = ""
         string += "Active" if self.is_active else "Inactive"
-        return f" listing: '{self.title}' by {self.poster} for ${self.start_price}"
+        return f" listing: '{self.title}' by {self.poster} for ${self.start_price} at {self.datetime}"
 
 class Bid(models.Model):
     price = models.DecimalField(max_digits=MAX_PRICE_DIGITS, decimal_places=2, null=True)

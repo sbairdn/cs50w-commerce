@@ -1,9 +1,7 @@
 {% extends "auctions/layout.html" %}
 {% block body %}
-    <h2>Active Listings</h2>
-    {% for listing in listings %}
+    <h2>{{ listing.title }}</h2>
         <div>
-            <h4><a href="{% url 'listing' listing.id %}">{{ listing.title }}</a></h4>
             <ul>
                 <li><b>Price</b>: ${{ listing.start_price }}</li>
                 <li><b>Description</b>: {{ listing.description }}</li>
@@ -12,8 +10,15 @@
                 <img src="{{ listing.image.url }}" alt="{{ listing.title }}">
                 {% endif %}
             </ul>
+            {% if user.is_authenticated %}
+                <form method="post">
+                    {% csrf_token %}
+                    {% if on_watchlist %}
+                        <input type="submit" name="watchlist" value="Remove from Watchlist">
+                    {% else %}
+                        <input type="submit" name="watchlist" value="Add to Watchlist">
+                    {% endif %}
+                </form>
+            {% endif %}
         </div>
-    {% empty %}
-        <p>No active listings.</p>
-    {% endfor %}
 {% endblock %}

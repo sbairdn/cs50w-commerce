@@ -10,7 +10,7 @@ from .forms import CreateListingForm
 def index(request):
     "Display homepage with all active listings"
     return render(request, "auctions/index.html", {
-        "listings": Listing.objects.all()
+        "listings": reversed(Listing.objects.filter(is_active=True))
     })
 
 
@@ -72,13 +72,33 @@ def create_listing(request):
             "form": CreateListingForm()
         })
     else:
-        form = CreateListingForm(request.POST)
+        form = CreateListingForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save(commit=False)
+            form = form.save(commit=False)
             form.poster = request.user
+            form.current_price = request.POST['start_price']
             form.save()
         else:
             return render(request, "auctions/create.html", {
                 "form": form
             })
         return HttpResponseRedirect(reverse("index"))
+
+def listing(request, listing_id):
+    """View a specific listing."""
+    listing = Listing.objects.get(id=listing_id)
+    if request.method == "GET":
+        return rerender_listing(request, listing)
+    else:
+        form = request.POST
+        if form["watchlist"] == "Add to Watchlist":
+            request.user.watchlist.add(listing)
+        elif form["watchlist"] == "Remove from Watchlist":
+            request.user.watchlist.remove(listing)
+        return rerender_listing(request, listing)
+
+def rerender_listing(request, listing):
+    return render(request, "auctions/listing.html", {
+            "listing": listing,
+            "on_watchlist": listing in request.user.watchlist.all()
+        })
