@@ -4,13 +4,15 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User, Listing
+from .models import User, Listing, Category
 from .forms import CreateListingForm
 
 def index(request):
     "Display homepage with all active listings"
     return render(request, "auctions/index.html", {
-        "listings": reversed(Listing.objects.filter(is_active=True))
+        "listings": reversed(Listing.objects.filter(is_active=True)),
+        "title": "Active Listings",
+        "empty_message": "There are no active listings."
     })
 
 
@@ -65,6 +67,23 @@ def register(request):
     else:
         return render(request, "auctions/register.html")
 
+def categories(request):
+    """View proudct categories."""
+    categories = [category[0] for category in Category.choices]
+    print(categories)
+    return render(request, "auctions/categories.html", {
+        "categories": categories
+    })
+
+def category(request, category):
+    """Display all listings in a given category"""
+    listings = Listing.objects.filter(category=category)
+    return render(request, "auctions/index.html", {
+        "listings": listings,
+        "title": category,
+        "empty_message": "No items in category."
+    })
+
 def create_listing(request):
     """Create a listing to post."""
     if request.method == "GET":
@@ -98,7 +117,16 @@ def listing(request, listing_id):
         return rerender_listing(request, listing)
 
 def rerender_listing(request, listing):
+    """Rerender listings page with new context."""
     return render(request, "auctions/listing.html", {
             "listing": listing,
             "on_watchlist": listing in request.user.watchlist.all()
         })
+
+def watchlist(request):
+    """Display all listings in watchlist."""
+    return render(request, "auctions/index.html", {
+        "listings": request.user.watchlist.all(),
+        "title": "Watchlist",
+        "empty_message": "No items in watchlist."
+    })

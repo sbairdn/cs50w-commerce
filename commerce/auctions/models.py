@@ -8,14 +8,12 @@ class User(AbstractUser):
     watchlist = models.ManyToManyField('Listing', blank=True, related_name="watchlister")
     bids = models.ManyToManyField('Bid', blank=True, related_name="bidder")
 
-
 class Category(models.TextChoices):
     ART = 'Art'
     ELECTRONICS = 'Electronics'
     FASHION = 'Fashion'
     HOME = 'Home'
     TOYS = 'Toys'
-
 
 class Listing(models.Model):
     title = models.CharField(max_length=80)
