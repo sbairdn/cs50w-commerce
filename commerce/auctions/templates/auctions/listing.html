@@ -1,6 +1,15 @@
 {% extends "auctions/layout.html" %}
 {% block body %}
     <h2>{{ listing.title }}</h2>
+    {% if listing.current_bid %}
+        <h3>${{ listing.current_bid }}</h3>
+    {% else %}
+        <h3>${{ listing.start_price }}</h3>
+    {% endif %}
+
+    {% if message %}
+        <h3>{{ message }}</h3>
+    {% endif %}
         <div>
             <ul>
                 <li><b>Price</b>: ${{ listing.start_price }}</li>
@@ -18,6 +27,16 @@
                     {% else %}
                         <input type="submit" name="watchlist" value="Add to Watchlist">
                     {% endif %}
+                </form>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ bid_form }}
+                    <input type="submit" value="Place bid">
+                </form>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ comment_form }}
+                    <input type="submit" value="Post comment">
                 </form>
             {% endif %}
         </div>
