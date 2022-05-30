@@ -1,15 +1,15 @@
-from re import X
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User, Listing, Category, Bid
+from .models import User, Listing, Category 
 from .forms import BidForm, CreateListingForm, CommentForm
+from .helpers import update_watchlist, place_bid, post_comment
 
 def index_view(request):
-    "Display homepage with all active listings"
+    "Display homepage with all active listings."
     return render(request, "auctions/index.html", {
         "listings": reversed(Listing.objects.filter(is_active=True)),
         "title": "Active Listings",
@@ -18,6 +18,7 @@ def index_view(request):
 
 
 def login_view(request):
+    "Display login page."
     if request.method == "POST":
 
         # Attempt to sign user in
@@ -38,11 +39,13 @@ def login_view(request):
 
 
 def logout_view(request):
+    """Return user to default homepage when they log out."""
     logout(request)
     return HttpResponseRedirect(reverse("index"))
 
 
 def register_view(request):
+    "Display account registration page."
     if request.method == "POST":
         username = request.POST["username"]
         email = request.POST["email"]
@@ -114,45 +117,6 @@ def listing_view(request, listing_id):
         post_comment(request, listing)
         return render_listing(request, listing, message)
 
-def update_watchlist(request, listing):
-    watchlist_val = request.POST.get('watchlist', None)
-    if watchlist_val == "Add to Watchlist":
-        request.user.watchlist.add(listing)
-    elif watchlist_val == "Remove from Watchlist":
-        request.user.watchlist.remove(listing)
-
-def place_bid(request, listing):
-    bid_form = BidForm(request.POST or None)
-    bid_amount = None
-    if bid_form.is_valid():
-        bid_amount = bid_form.cleaned_data['bid']
-
-        bid = Bid()
-        bid.listing = listing
-        bid.bid = bid_amount
-        bid.bidder = request.user
-        bid.save()
-
-        message = None
-        if listing.current_bid is not None:
-            if bid_amount <= float(listing.current_bid.bid):
-                message = "Bid rejected: your bid must be greater than the current value"
-            else:
-                listing.current_bid = bid
-        else:
-            if bid_amount < float(listing.start_price):
-                message = "Bid rejected: your bid must be greater than the start value"
-            else:
-                listing.current_bid = bid
-
-        request.user.bids.add(bid)
-        listing.save()
-        return message
-
-def post_comment(request, listing):
-    comment = request.POST.get('comment', None)
-    if comment is not None:
-        listing.comments = comment
 
 def render_listing(request, listing, message):
     """Render listings page with any new context."""
