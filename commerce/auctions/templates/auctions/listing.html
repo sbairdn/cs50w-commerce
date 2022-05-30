@@ -38,6 +38,14 @@
                     {{ comment_form }}
                     <input type="submit" value="Post comment">
                 </form>
+                <h3> Comments </h3>
+                {% for comment in comments %}
+                    <p>{{ comment.commenter }} - {{comment.datetime }}</p>
+                    <p>{{ comment.text }}</p>
+                    <br>
+                {% empty %}
+                    <p>No comments.</p>
+                {% endfor %}
             {% endif %}
         </div>
 {% endblock %}

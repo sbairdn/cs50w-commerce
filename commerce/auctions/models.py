@@ -33,7 +33,8 @@ class Listing(models.Model):
     poster = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="postings", null=True)
     datetime = models.DateTimeField(auto_now_add=True, null=True)
-
+    comments = models.ManyToManyField(
+        'Comment', blank=True, related_name="comment_listing")
     def __str__(self):
         string = ""
         string += "Active" if self.is_active else "Inactive"
@@ -53,8 +54,8 @@ class Bid(models.Model):
 
 class Comment(models.Model):
     listing = models.ForeignKey(
-        Listing, on_delete=models.CASCADE, related_name="comments", null=True)
-    comment = models.CharField(max_length=500, blank=True)
+        Listing, on_delete=models.CASCADE, related_name="listing_comments", null=True)
+    text = models.TextField(max_length=500, blank=True)
     commenter = models.ForeignKey(
         User, on_delete=models.CASCADE, null=True, related_name="comments")
     datetime = models.DateTimeField(auto_now_add=True, null=True)

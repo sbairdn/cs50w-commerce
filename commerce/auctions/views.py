@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User, Listing, Category 
+from .models import User, Listing, Category
 from .forms import BidForm, CreateListingForm, CommentForm
 from .helpers import update_watchlist, place_bid, post_comment
 
@@ -125,7 +125,8 @@ def render_listing(request, listing, message):
             "message": message,
             "on_watchlist": listing in request.user.watchlist.all(),
             "bid_form": BidForm(),
-            "comment_form": CommentForm()
+            "comment_form": CommentForm(),
+            "comments": listing.comments.all()
         })
 
 

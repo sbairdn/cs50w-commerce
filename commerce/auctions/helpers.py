@@ -1,4 +1,4 @@
-from .models import Bid
+from .models import Bid, Comment
 from .forms import BidForm
 
 def update_watchlist(request, listing):
@@ -43,6 +43,11 @@ def place_bid(request, listing):
 
 def post_comment(request, listing):
     """Post a comment to the current listing's page."""
-    comment = request.POST.get('comment', None)
-    if comment is not None:
-        listing.comments = comment
+    text = request.POST.get('text', None)
+    comment = Comment()
+    if text is not None:
+        comment.listing = listing
+        comment.text = text
+        comment.commenter = request.user
+        comment.save()
+        listing.comments.add(comment)
