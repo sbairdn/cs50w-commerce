@@ -5,10 +5,10 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User, Listing, Category
-from .forms import CreateBidForm, CreateListingForm, CreateCommentForm
+from .models import User, Listing, Category, Bid
+from .forms import BidForm, CreateListingForm, CommentForm
 
-def index(request):
+def index_view(request):
     "Display homepage with all active listings"
     return render(request, "auctions/index.html", {
         "listings": reversed(Listing.objects.filter(is_active=True)),
@@ -42,7 +42,7 @@ def logout_view(request):
     return HttpResponseRedirect(reverse("index"))
 
 
-def register(request):
+def register_view(request):
     if request.method == "POST":
         username = request.POST["username"]
         email = request.POST["email"]
@@ -68,7 +68,7 @@ def register(request):
     else:
         return render(request, "auctions/register.html")
 
-def categories(request):
+def categories_view(request):
     """View proudct categories."""
     categories = [category[0] for category in Category.choices]
     print(categories)
@@ -76,7 +76,7 @@ def categories(request):
         "categories": categories
     })
 
-def category(request, category):
+def category_view(request, category):
     """Display all listings in a given category"""
     listings = Listing.objects.filter(category=category)
     return render(request, "auctions/index.html", {
@@ -85,7 +85,7 @@ def category(request, category):
         "empty_message": "No items in category."
     })
 
-def create_listing(request):
+def create_listing_view(request):
     """Create a listing to post."""
     if request.method == "GET":
         return render(request, "auctions/create.html", {
@@ -103,50 +103,69 @@ def create_listing(request):
             })
         return HttpResponseRedirect(reverse("index"))
 
-def listing(request, listing_id):
+def listing_view(request, listing_id):
     """View a specific listing."""
     listing = Listing.objects.get(id=listing_id)
     if request.method == "GET":
         return render_listing(request, listing, None)
     else:
-        watchlist_val = request.POST.get('watchlist', None)
-        bid = request.POST.get('bid', None)
-        comment = request.POST.get('comment', None)
-        message = None
-        if watchlist_val == "Add to Watchlist":
-            request.user.watchlist.add(listing)
-        elif watchlist_val == "Remove from Watchlist":
-            request.user.watchlist.remove(listing)
-        if bid is not None:
-            bid = float(bid)
-            print(f"BID: {bid}")
-            print(listing.current_bid)
-            if listing.current_bid is not None:
-                if bid <= float(listing.current_bid):
-                    message = "Error: bid must be greater than current bid"
-                else:
-                    listing.current_bid = bid
-            else:
-                if bid < float(listing.start_price):
-                    message = "Error: bid must be greater than start price"
-                else:
-                    listing.current_bid = bid
-            listing.save()
-        if comment is not None:
-            listing.comments = comment
+        update_watchlist(request, listing)
+        message = place_bid(request, listing)
+        post_comment(request, listing)
         return render_listing(request, listing, message)
- 
+
+def update_watchlist(request, listing):
+    watchlist_val = request.POST.get('watchlist', None)
+    if watchlist_val == "Add to Watchlist":
+        request.user.watchlist.add(listing)
+    elif watchlist_val == "Remove from Watchlist":
+        request.user.watchlist.remove(listing)
+
+def place_bid(request, listing):
+    bid_form = BidForm(request.POST or None)
+    bid_amount = None
+    if bid_form.is_valid():
+        bid_amount = bid_form.cleaned_data['bid']
+
+        bid = Bid()
+        bid.listing = listing
+        bid.bid = bid_amount
+        bid.bidder = request.user
+        bid.save()
+
+        message = None
+        if listing.current_bid is not None:
+            if bid_amount <= float(listing.current_bid.bid):
+                message = "Bid rejected: your bid must be greater than the current value"
+            else:
+                listing.current_bid = bid
+        else:
+            if bid_amount < float(listing.start_price):
+                message = "Bid rejected: your bid must be greater than the start value"
+            else:
+                listing.current_bid = bid
+
+        request.user.bids.add(bid)
+        listing.save()
+        return message
+
+def post_comment(request, listing):
+    comment = request.POST.get('comment', None)
+    if comment is not None:
+        listing.comments = comment
+
 def render_listing(request, listing, message):
     """Render listings page with any new context."""
     return render(request, "auctions/listing.html", {
             "listing": listing,
             "message": message,
             "on_watchlist": listing in request.user.watchlist.all(),
-            "bid_form": CreateBidForm(),
-            "comment_form": CreateCommentForm()
+            "bid_form": BidForm(),
+            "comment_form": CommentForm()
         })
 
-def watchlist(request):
+
+def watchlist_view(request):
     """Display all listings in watchlist."""
     return render(request, "auctions/index.html", {
         "listings": request.user.watchlist.all(),

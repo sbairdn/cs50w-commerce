@@ -2,7 +2,7 @@
 {% block body %}
     <h2>{{ listing.title }}</h2>
     {% if listing.current_bid %}
-        <h3>${{ listing.current_bid }}</h3>
+        <h3>${{ listing.current_bid.bid }}</h3>
     {% else %}
         <h3>${{ listing.start_price }}</h3>
     {% endif %}
@@ -12,11 +12,11 @@
     {% endif %}
         <div>
             <ul>
-                <li><b>Price</b>: ${{ listing.start_price }}</li>
+                <li><b>Original price</b>: ${{ listing.start_price }}</li>
                 <li><b>Description</b>: {{ listing.description }}</li>
                 <li><b>Posted</b>: {{ listing.datetime }} by {{ listing.poster }}</li>
                 {% if listing.image %}
-                <img src="{{ listing.image.url }}" alt="{{ listing.title }}">
+                    <img src="{{ listing.image.url }}" alt="{{ listing.title }}">
                 {% endif %}
             </ul>
             {% if user.is_authenticated %}

@@ -6,12 +6,12 @@ class CreateListingForm(ModelForm):
         model = Listing
         fields = ['title', 'description', 'start_price', 'image', 'category']
 
-class CreateBidForm(ModelForm):
+class BidForm(ModelForm):
     class Meta:
         model = Bid
         fields = ['bid']
 
-class CreateCommentForm(ModelForm):
+class CommentForm(ModelForm):
     class Meta:
         model = Comment
         fields = ['comment']
