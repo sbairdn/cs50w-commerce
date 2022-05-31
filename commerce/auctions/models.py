@@ -35,6 +35,7 @@ class Listing(models.Model):
     datetime = models.DateTimeField(auto_now_add=True, null=True)
     comments = models.ManyToManyField(
         'Comment', blank=True, related_name="comment_listing")
+        
     def __str__(self):
         string = ""
         string += "Active" if self.is_active else "Inactive"

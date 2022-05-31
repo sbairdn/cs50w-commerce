@@ -6,7 +6,7 @@ from django.urls import reverse
 
 from .models import User, Listing, Category
 from .forms import BidForm, CreateListingForm, CommentForm
-from .helpers import update_watchlist, place_bid, post_comment
+from .helpers import update_watchlist, place_bid, post_comment, close_auction
 
 def index_view(request):
     "Display homepage with all active listings."
@@ -115,15 +115,19 @@ def listing_view(request, listing_id):
         update_watchlist(request, listing)
         message = place_bid(request, listing)
         post_comment(request, listing)
+        close_auction(request, listing)
         return render_listing(request, listing, message)
 
 
 def render_listing(request, listing, message):
     """Render listings page with any new context."""
+    on_watchlist = False
+    if request.user.is_authenticated:
+        on_watchlist = listing in request.user.watchlist.all()
     return render(request, "auctions/listing.html", {
             "listing": listing,
             "message": message,
-            "on_watchlist": listing in request.user.watchlist.all(),
+            "on_watchlist": on_watchlist,
             "bid_form": BidForm(),
             "comment_form": CommentForm(),
             "comments": listing.comments.all()

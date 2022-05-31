@@ -7,11 +7,15 @@
             <div>
                 <h4><a href="{% url 'listing' listing.id %}">{{ listing.title }}</a></h4>
                 <ul>
-                    <li><b>Price</b>: ${{ listing.start_price }}</li>
+                    {% if listing.current_bid %}
+                        <li><b>Current bid</b>: ${{ listing.current_bid.bid }}</li>
+                    {% else %}
+                        <li><b>Starting price</b>: ${{ listing.start_price }} - no bids yet</li>
+                    {% endif %}
                     <li><b>Description</b>: {{ listing.description }}</li>
                     <li><b>Posted</b>: {{ listing.datetime }} by {{ listing.poster }}</li>
                     {% if listing.image %}
-                    <img src="{{ listing.image.url }}" alt="{{ listing.title }}">
+                        <img src="{{ listing.image.url }}" alt="{{ listing.title }}">
                     {% endif %}
                 </ul>
             </div>

@@ -51,3 +51,11 @@ def post_comment(request, listing):
         comment.commenter = request.user
         comment.save()
         listing.comments.add(comment)
+
+def close_auction(request, listing):
+    """Close auction when poster chooses to do so."""
+    should_close = request.POST.get('close-auction', None)
+    print(should_close)
+    if should_close == "Close my auction":
+        listing.is_active = False
+        listing.save()

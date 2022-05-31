@@ -1,6 +1,11 @@
 {% extends "auctions/layout.html" %}
 {% block body %}
+    {% if not listing.is_active and listing.current_bid.bidder == user %}
+        <h2>You have won the auction!</h2>
+    {% endif %}
+
     <h2>{{ listing.title }}</h2>
+
     {% if listing.current_bid %}
         <h3>${{ listing.current_bid.bid }}</h3>
     {% else %}
@@ -10,42 +15,59 @@
     {% if message %}
         <h3>{{ message }}</h3>
     {% endif %}
-        <div>
-            <ul>
-                <li><b>Original price</b>: ${{ listing.start_price }}</li>
-                <li><b>Description</b>: {{ listing.description }}</li>
-                <li><b>Posted</b>: {{ listing.datetime }} by {{ listing.poster }}</li>
-                {% if listing.image %}
-                    <img src="{{ listing.image.url }}" alt="{{ listing.title }}">
-                {% endif %}
-            </ul>
-            {% if user.is_authenticated %}
-                <form method="post">
-                    {% csrf_token %}
-                    {% if on_watchlist %}
-                        <input type="submit" name="watchlist" value="Remove from Watchlist">
-                    {% else %}
-                        <input type="submit" name="watchlist" value="Add to Watchlist">
-                    {% endif %}
-                </form>
-                <form method="post">
-                    {% csrf_token %}
-                    {{ bid_form }}
-                    <input type="submit" value="Place bid">
-                </form>
-                <form method="post">
-                    {% csrf_token %}
-                    {{ comment_form }}
-                    <input type="submit" value="Post comment">
-                </form>
-                <h3> Comments </h3>
-                {% for comment in comments %}
-                    <p>{{ comment.commenter }} - {{comment.datetime }}</p>
-                    <p>{{ comment.text }}</p>
-                    <br>
-                {% empty %}
-                    <p>No comments.</p>
-                {% endfor %}
+
+    {% if listing.is_active %}
+        <h4>Auction is active</h4>
+    {% else %}
+        <h4>Auction has closed</h4>
+    {% endif %}
+    
+    {% if user.is_authenticated and listing.poster == user %}
+        <form method="post">
+            {% csrf_token %}
+            {% if listing.is_active %}
+                <input type="submit" name="close-auction" value="Close my auction">
             {% endif %}
-        </div>
+        </form>
+    {% endif %}
+
+    <ul>
+        <li><b>Original price</b>: ${{ listing.start_price }}</li>
+        <li><b>Description</b>: {{ listing.description }}</li>
+        <li><b>Posted</b>: {{ listing.datetime }} by {{ listing.poster }}</li>
+        {% if listing.image %}
+            <img src="{{ listing.image.url }}" alt="{{ listing.title }}">
+        {% endif %}
+    </ul>
+
+    {% if user.is_authenticated and listing.is_active %}
+        <form method="post">
+            {% csrf_token %}
+            {% if on_watchlist %}
+                <input type="submit" name="watchlist" value="Remove from Watchlist">
+            {% else %}
+                <input type="submit" name="watchlist" value="Add to Watchlist">
+            {% endif %}
+        </form>
+        <form method="post">
+            {% csrf_token %}
+            {{ bid_form }}
+            <input type="submit" value="Place bid">
+        </form>
+        <form method="post">
+            {% csrf_token %}
+            {{ comment_form }}
+            <input type="submit" value="Post comment">
+        </form>
+    {% endif %}
+
+    <h3> Comments </h3>
+    {% for comment in comments %}
+        <p>{{ comment.commenter }} - {{comment.datetime }}</p>
+        <p>{{ comment.text }}</p>
+        <br>
+    {% empty %}
+        <p>No comments.</p>
+    {% endfor %}
+
 {% endblock %}
