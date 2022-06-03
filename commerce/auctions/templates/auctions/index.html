@@ -1,26 +1,38 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>{{ title }}</h2>
-    {% block listings %}
-        {% for listing in listings %}
-            <div>
-                <h4><a href="{% url 'listing' listing.id %}">{{ listing.title }}</a></h4>
-                <ul>
-                    {% if listing.current_bid %}
-                        <li><b>Current bid</b>: ${{ listing.current_bid.bid }}</li>
-                    {% else %}
-                        <li><b>Starting price</b>: ${{ listing.start_price }} - no bids yet</li>
-                    {% endif %}
-                    <li><b>Description</b>: {{ listing.description }}</li>
-                    <li><b>Posted</b>: {{ listing.datetime }} by {{ listing.poster }}</li>
-                    {% if listing.image %}
-                        <img src="{{ listing.image.url }}" alt="{{ listing.title }}">
-                    {% endif %}
-                </ul>
+  <h2>{{ title }}</h2>
+  {% block listings %}
+    {% for listing in listings %}
+      <div class="container card mt-3">
+        <br>
+        <h4><a href="{% url 'listing' listing.id %}">{{ listing.title }}</a></h4>
+        <hr>
+        <div class="container">
+          <div class="row">
+            <ul class="col-8">
+              {% if listing.current_bid %}
+                <li><b>Current bid</b>: ${{ listing.current_bid.bid }}</li>
+              {% else %}
+                <li><b>Starting price</b>: ${{ listing.start_price }} - no bids yet</li>
+              {% endif %}
+              <li><b>Description</b>: {{ listing.description }}</li>
+              {% if listing.category %}
+                <li><b>Category</b>: {{listing.category }}</li>
+              {% endif %}
+              <li><b>Posted</b>: {{ listing.datetime }} by {{ listing.poster }}</li>
+            </ul>
+            <div class="listing-image col-lg-3">
+              {% if listing.image %}
+                <img src="{{ listing.image.url }}" alt="{{ listing.title }}" class="img-thumbnail">
+              {% endif %}
             </div>
-        {% empty %}
-            <p>{{ empty_message }}</p>
-        {% endfor %}
-    {% endblock %}
+          </div>
+        </div>
+      </div>
+
+    {% empty %}
+      <p>{{ empty_message }}</p>
+    {% endfor %}
+  {% endblock %}
 {% endblock %}

@@ -4,9 +4,9 @@ from .forms import BidForm
 def update_watchlist(request, listing):
     """Update watchlist for a specific user"""
     watchlist_val = request.POST.get('watchlist', None)
-    if watchlist_val == "Add to Watchlist":
+    if watchlist_val == "Add to watchlist":
         request.user.watchlist.add(listing)
-    elif watchlist_val == "Remove from Watchlist":
+    elif watchlist_val == "Remove from watchlist":
         request.user.watchlist.remove(listing)
 
 def place_bid(request, listing):
@@ -28,12 +28,12 @@ def place_bid(request, listing):
         message = None
         if listing.current_bid is not None:
             if bid_amount <= float(listing.current_bid.bid):
-                message = "Bid rejected: your bid must be greater than the current value"
+                message = "Bid rejected: your bid must be greater than the current value."
             else:
                 listing.current_bid = bid
         else:
             if bid_amount < float(listing.start_price):
-                message = "Bid rejected: your bid must be greater than the start value"
+                message = "Bid rejected: your bid must be greater than the start value."
             else:
                 listing.current_bid = bid
 

@@ -1,3 +1,86 @@
 body {
-    padding: 10px;
+    padding-left: 10px;
+    background-color: rgb(253, 253, 253);
+}
+
+#main-content {
+    padding-left: 30px;
+    padding-right: 30px;
+}
+
+.nav {
+    margin-left: 100px
+}
+
+.nav-link {
+    font-size: large;
+    font-weight: bold;
+    color: darkgreen;
+}
+
+#top-bar {
+    background-color: rgb(244, 255, 247);
+}
+
+a {
+    color: darkgreen;
+}
+
+h2 {
+    font-family:'Playfair', 'Didot', 'Georgia', serif;
+    font-weight: bold;
+    font-size: 40px;
+    color: rgb(95, 95, 95);
+    margin-bottom: 20px;
+}
+
+#site-name {
+    font-family:'Playfair', 'Didot', 'Georgia', serif;
+    font-weight: bold;
+    font-size: 45px;
+    padding-top: 5px
+}
+
+.logo {
+    padding-right: 40px;
+}
+
+#listing-heading {
+    margin-bottom: 20px;
+    margin-left: 15px;
+}
+
+#listing-heading * {
+    display: inline-block;
+    vertical-align: top; 
+    margin-inline: 3px;
+}
+
+#auction-active-text {
+    color: rgb(46, 117, 4);
+}
+
+#auction-closed-text {
+    color: rgb(117, 106, 42)
+}
+
+.listing-image {
+    margin-bottom: 20px;
+    margin-left: 25px;
+}
+
+.form-inline > * {
+    margin: 10px;
+}
+
+#comment-button {
+    margin-top: 10px !important;
+}
+
+#create-listing-form > label {
+    margin-top: 20px;
+}
+
+#comment-text {
+    margin-left: 10px;
 }

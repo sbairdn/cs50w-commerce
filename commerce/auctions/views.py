@@ -80,8 +80,8 @@ def categories_view(request):
     })
 
 def category_view(request, category):
-    """Display all listings in a given category"""
-    listings = Listing.objects.filter(category=category)
+    """Display all active listings in a given category"""
+    listings = Listing.objects.filter(category=category, is_active=True)
     return render(request, "auctions/index.html", {
         "listings": listings,
         "title": category,
