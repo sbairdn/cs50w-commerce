@@ -74,7 +74,6 @@ def register_view(request):
 def categories_view(request):
     """View proudct categories."""
     categories = [category[0] for category in Category.choices]
-    print(categories)
     return render(request, "auctions/categories.html", {
         "categories": categories
     })
